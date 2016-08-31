@@ -1,3 +1,5 @@
+import timeit
+
 string_one = "Python version: {x}.{y}".format(x=3, y=14)
 
 
@@ -110,3 +112,6 @@ def need_a_decorator():
 # from collections import Counter                                   # count every item in a list and create a dict
 # from collections import OrderedDict                               # dict that save the order of key/value pare
 # from collections import namedtuple                                # the same as class constructor
+
+# check speed of a function
+timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
