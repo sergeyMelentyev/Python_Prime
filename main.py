@@ -1,18 +1,83 @@
 import timeit
 
+
+'''COMPARISON'''
+w < x < y < z
+# the same as
+w < x and x < y and y < z
+
+
+'''OPERATORS WITH ANY SEQUENCE TYPES'''
+objOne + objTwo                                                     # concatenation
+objOne * n                                                          # makes n copies of objOne
+varOne, varTwo, varThree = objOne                                   # variable unpacking
+varOne in objOne                                                    # membership
+for x in objOne:                                                    # iteration
+all(objOne)                                                         # return True if all items are true
+any(objOne)                                                         # return True if any item is true
+len(objOne)                                                         # length
+min(objOne)                                                         # min/max value in objOne
+sum(objOne [,initial])                                              # summ of items with an optional initial value
+
+
+'''STRING IMMUTABLE OBJECTS'''
 string_one = "Python version: {x}.{y}".format(x=3, y=14)
+stringName.capitalize()                                             # capitalizes the first character
+stringName.count(sub [,start [,end]])                               # counts occurences of the specified substring
+stringName.startswith(prefix [,start [,end]])                       # checks whether a string starts with prefix
+stringName.endswith(suffix [,start [,end]])                         # checks the end of the string for a suffix
+stringName.find(sub [,start [,end]])                                # finds the first occurrence of the specified sub
+stringName.rfind(sub [,start [,end]])                               # finds the last occurrence of a sub
+stringName.split([sep [,maxsplit]])                                 # splits a str using separator as a delimiter
+stringName.rsplit(sep, [,maxsplit])                                 # splits a str from the end using separator
+stringName.isalnum()                                                # whether all chars are alphanumeric
+stringName.isalpha()                                                # whether all chars are alphabetic
+stringName.isdigit()                                                # whether all chars are digits
+stringName.join(separator)                                          # joins the string with a separator
+stringName.lower()                                                  # to lower case, to upper case
+stringName.replace(oldSub, newSub [,maxreplace])                    # replace a substring
+stringName.
+
+
+'''LIST MUTABLE OBJECT'''
+del listName[index]                                                 # deletes an element
+del listName[indexStart : indexEnd]                                 # deletes a slice
+listName.append(obj)                                                # add one object to the end
+listName.extend(newListName)                                        # add a new list to the end
+listName.count(obj)                                                 # counts occurrences of obj
+listName.index(obj [,start [,stop]])                                # returns the smallest index of obj
+listName.insert(index, obj)                                         # inserts obj at index
+listName.pop([index])                                               # return elem on index and remove it from the list
+listName.remove(obj)                                                # remove obj
+listName.reverse()                                                  # reverses items in place
+listName.sort([sortFunc [,reverse]])                                # sort list of items
 
 
 '''DICTIONARY OBJECT'''
-dict_one = {'k1': 1, 'k2': 2, 'k3': 3}
-dict_all_keys = dict_one.keys()                                     # make a list of all keys/values/items
+dict_all_keys = dictName.keys()                                     # make a list of all keys/values/items
+del dictName[key]                                                   # removes from dict
+key in dictName                                                     # returns true if key is here
+dictName.clear()                                                    # removes all items
+dictName.copy()                                                     # copy
+dictName.fromkeys(sequence [,value])                                # create new dict with keys from sequence and values all set to value
+dictName.get(key [,value])                                          # returns dictName[key], otherwise value
+dictName.pop(key [,default])                                        # returns dictName[key] and removes it from dictName
+dictName.update(dictNewName)                                        # add all obj from dictNewName to dictName
 
 
 '''SET OBJECT'''
-set_one = {1, 2, 3}                                                 # unordered collection of unique items
+setName = {1, 2, 3}                                                 # unordered collection of unique items
+setName.copy()                                                      # copy
+setName.difference(setNewName)                                      # returns all the items in setName but not in setNewName
+setName.intersection(setNewName)                                    # returns all the items that are both in two sets
+setName.isdisjoint(setNewName)                                      # returns true if both have no items in common
+setName.issubset(setNewName)                                        # true if setName is a subset of setNewName
+setName.isuperset(setNewName)                                       # true if setName is a superset of setNewName
+setName.symmetric_difference(setNewName)                            # return all items that are in first or second set but not in both
+setName.union(setNewName)                                           # return all items in setNewName or setName
 
 
-'''TUPLE OBJECT'''
+'''TUPLE IMMUTABLE OBJECTS'''
 tuple_one = (1, 1, 2, 3)                                            # immutable ordered collection
 tuple_count = tuple_one.count(1)                                    # calc how many times arg take place in tuple
 
@@ -52,8 +117,25 @@ class Sample_Class(object):
         self.name = name
         self.last_name = last_name
 
-    def method_print(self):
+    @classmethod
+    def class_method(cls, arg):
+        # logic here
+
+    @staticmethod
+    def static_method(arg):
+        #logic here
+
+    def instance_method(self):
         print(self.name, ' + ', self.last_name, ' + ', Sample_Class.species)
+
+# create a callable obj that wraps both a func and an associated instance
+classInstance = Sample_Class("Sergey", "Melentyev")
+boundMethod = classInstance.instance_method
+boundMethod()
+
+# create a callable obj that wraps the method func, but expecs as instance of the propper type to be passed
+unboundMethod = Sample_Class.instance_method
+unboundMethod(classInstance, "Sergey", "Melentyev")
 
 
 class Sample_Sub_Class(Sample_Class):
@@ -61,7 +143,7 @@ class Sample_Sub_Class(Sample_Class):
         Sample_Class.__init__(self, name, last_name)                # call super class constructor
         self.second_name = second_name
 
-    def sub_method_print(self):
+    def sub_instance_method(self):
         print(self.name, ' + ', self.last_name, ' + ', Sample_Class.species, ' + ', self.second_name)
 
 
@@ -104,7 +186,7 @@ def need_a_decorator():
     print('This function needs a decorator')
 
 
-'''ITERATORS GENERATORS'''
+'''GENERATORS'''
 # yield == return in order to keep track only on current call
 
 
