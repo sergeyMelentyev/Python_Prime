@@ -6,6 +6,25 @@ w < x < y < z
 # the same as
 w < x and x < y and y < z
 
+x == y  # equal value
+x is y  # equal obj in memory
+z = x if x < y else y   #conditional expression
+
+
+'''NAMESPACE'''
+globalVarNameOne = 4
+GlobalVarNameTwo = 8
+def funcName():
+    global globalVarNameOne
+    globalVarNameOne = 14                                           # modify global variable
+    GlobalVarNameTwo = 0                                            # create a new local variable
+
+def countDown(start):
+    n = start
+    def decrement():                                                # nonlocal does not bind a name to a local variable
+        nonlocal n
+        n -= 1
+
 
 '''OPERATORS WITH ANY SEQUENCE TYPES'''
 objOne + objTwo                                                     # concatenation
@@ -54,6 +73,7 @@ listName.sort([sortFunc [,reverse]])                                # sort list 
 
 
 '''DICTIONARY OBJECT'''
+# Key values can be any immutable object (string, number, tuple)
 dict_all_keys = dictName.keys()                                     # make a list of all keys/values/items
 del dictName[key]                                                   # removes from dict
 key in dictName                                                     # returns true if key is here
@@ -86,21 +106,38 @@ tuple_count = tuple_one.count(1)                                    # calc how m
 matrix_one = [[1, 1, 1], [4, 5, 6], [7, 8, 9]]
 matrix_two = [(1, 2), (3, 4), (5, 6)]
 
-l_comprehension_one = [row[0] for row in matrix_one]                # take the first element in each row
-l_comprehension_two = [(letter+'a') for letter in 'Hi']             # what you want + how you call it + where
-l_comprehension_three = [(z+1) for z in range(5) if z % 2 == 0]     # what you want + how you call it + where + if
+# list comprehension
+l_comp_one = [row[0] for row in matrix_one]                         # take the first element in each row
+l_comp_two = [(letter+'a') for letter in 'Hi']                      # what you want + how you call it + where
+l_comp_three = [(z+1) for z in range(5) if z % 2 == 0]              # what you want + how you call it + where + if
+l_comp_four = [(x,y) for x in listA for y in listB]
 
+# generator expression
+g_express_one = (10 * i for i in matrix_one)
+g_express_one.next()
+
+while expression:
+    pass
 for x in range(10):                                                 # generator function (will not save values in ram)
     pass
-
 for y in matrix_one:                                                # work with any sequence
     pass
-
 for (a, b) in matrix_two:                                           # tuple unpacking
     pass
-
 for (key, value) in dict_one.items():                               # dictionary iteration
     pass
+
+for index, value in enumerate(matrix_one):                          # iterator that returns sequence of tuples (index, value)
+    matrix_one[index] = value * value
+
+for x, y in zip(listOne, listTwo):                                  # combines two lists into a sequence of tuples
+    # (listOne[0], listTwo[0]), (listOne[1], listTwo[1])
+
+for x in matrix_one:                                                # else will be executed if loop is runs to completion
+    if not True:
+        break # else clause is skipped
+else:
+    raise RuntimeError("Error")
 
 
 '''SCOPE'''
@@ -157,11 +194,72 @@ else:
 finally:
     print("This will be printed in any case")
 
+try:
+    # catch all exceptions in one place
+except Exception as e:
+    print("An error: {err}\n".format(err=e))
+
+class MyOwnErrorType(Exception):                                    # Create a custom exception
+    def __init__(self, errno, msg):
+        self.args = (errno, msg)
+        self.errno = errno
+        self.errmsg = msg
+
+class HostNameError(MyOwnErrorType): pass
+class TimeOutError(MyOwnErrorType): pass
+def errorOne(): raise HostNameError("Unknown host")
+def errorTwo(): raise TimeOutError("Timed out")
+try:
+    errorOne()
+except MyOwnErrorType as e:
+    if type(e) is HostNameError:
+        #logic here
+
+class ListTransaction(object):
+    def __init__(self, theList):
+        self.theList = theList
+    def __enter__(self):
+        self.workingCopy = list(self.theList)
+        return self.workingCopy
+    def __exit__(self, type, value, tb):
+        if type is None:
+            self.theList[:] = self.workingCopy
+        return False
+
+
+'''CONTEXT MANAGER AND WITH'''
+items = [1, 2, 3]
+class ListTransaction(object):
+    def __init__(self, theList):
+        self.theList = theList
+    def __enter__(self):
+        self.workingCopy = list(self.theList)
+        return self.workingCopy
+    def __exit__(self, type, value, tb):
+        if type is None:
+            self.theList[:] = self.workingCopy
+        return False
+
+with ListTransaction(items) as working:                                 # will produce [1, 2, 3, 4, 5]
+    working.append(4)
+    working.append(5)
+
+try:
+    with ListTransaction(items) as working:                             # will produce [1, 2, 3, 4, 5]
+        working.append(6)
+        working.append(7)
+        raise RuntimeError("Something happened!")
+except RuntimeError:
+    pass
+
+
 
 '''BUILD-IN FUNCTIONS'''
 # map() apply a func to every item in a list, return a list of all items
+lambda_function = lambda arg_one,arg_two: arg_one + arg_two
 sample_list = [0, 22.5, 40, 100]
 mapped_lambda = list(map(lambda arg: (9.0/5*arg + 32), sample_list))
+
 
 def sample_function(arg): return (9.0/5)*arg + 32
 mapped_list = list(map(sample_function, sample_list))
@@ -181,8 +279,8 @@ def decorator_func(func):
         print('Code here will execute after all')
     return insider_func
 
-@decorator_func
-def need_a_decorator():
+@decorator_func #more than one can be applied
+def any_func_name():
     print('This function needs a decorator')
 
 
