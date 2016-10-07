@@ -1,4 +1,7 @@
-import timeit
+import timeit   # create new namespace as a container for all obj; execute the code;
+import timeit as timer  # custom name to refer to a module
+from timeit import foo  # load specific definition within a module
+from timeit import *    # load all definitions except those that start with an underscore
 
 
 '''COMPARISON'''
@@ -147,23 +150,38 @@ all_global_one = globals()['string_one']                            # get object
 
 
 '''CLASSES AND OBJECTS'''
-class Sample_Class(object):
-    species = 'Human'                                               # class object attribute (the same for all objects)
-
-    def __init__(self, name, last_name):                            # object constructor
-        self.name = name
-        self.last_name = last_name
-
-    @classmethod
-    def class_method(cls, arg):
-        # logic here
+# functions (methods), variables (class variables), computed attributes (properties)
+class SampleClass(object):
+    species = 'Human'                                         # class object attribute the same for all instances
 
     @staticmethod
-    def static_method(arg):
-        #logic here
+    def static_method(arg): pass
+
+    @classmethod
+    def class_method(cls, arg): pass
+
+    def __init__(self, name, last_name):
+        self.__name = name
+        self.__last_name = last_name
+
+    @property
+    def name(self):
+        # property getter, accessed as instanceName.name
+        return self.__name
+
+    @name.setter
+    def name(self, value):
+        # property setter, accessed as instanceName.name = "new str"
+        if not isinstance(value, str):
+            raise TypeError("Must be a string!")
+        self.__name = value
+
+    @name.deleter
+    def name(self):
+        raise TypeError("Cannot delete name")
 
     def instance_method(self):
-        print(self.name, ' + ', self.last_name, ' + ', Sample_Class.species)
+        pass
 
 # create a callable obj that wraps both a func and an associated instance
 classInstance = Sample_Class("Sergey", "Melentyev")
@@ -174,14 +192,14 @@ boundMethod()
 unboundMethod = Sample_Class.instance_method
 unboundMethod(classInstance, "Sergey", "Melentyev")
 
-
 class Sample_Sub_Class(Sample_Class):
     def __init__(self, name, last_name, second_name):               # sub class constructor
         Sample_Class.__init__(self, name, last_name)                # call super class constructor
         self.second_name = second_name
 
     def sub_instance_method(self):
-        print(self.name, ' + ', self.last_name, ' + ', Sample_Class.species, ' + ', self.second_name)
+        super().instance_method()                                   # call super class method
+        pass
 
 
 '''EXCEPTION HANDLING'''
