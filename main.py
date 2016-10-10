@@ -1,20 +1,22 @@
 import timeit   # create new namespace as a container for all obj; execute the code;
+import array, math, fractions, random
 import timeit as timer  # custom name to refer to a module
 from timeit import foo  # load specific definition within a module
 from timeit import *    # load all definitions except those that start with an underscore
 
 
 '''COMPARISON'''
-w < x < y < z
-# the same as
+w < x < y < z # the same as
 w < x and x < y and y < z
 
 x == y  # equal value
 x is y  # equal obj in memory
-z = x if x < y else y   #conditional expression
+z = x if x < y else y   # conditional expression
 
 
 '''NAMESPACE'''
+all_global = globals().keys()                                       # get all global objects as one dictionary
+all_global_one = globals()['string_one']                            # get object from global scope
 globalVarNameOne = 4
 GlobalVarNameTwo = 8
 def funcName():
@@ -44,6 +46,7 @@ sum(objOne [,initial])                                              # summ of it
 
 '''STRING IMMUTABLE OBJECTS'''
 string_one = "Python version: {x}.{y}".format(x=3, y=14)
+string_two = "Python version: %s" % time.ctime()
 stringName.capitalize()                                             # capitalizes the first character
 stringName.count(sub [,start [,end]])                               # counts occurences of the specified substring
 stringName.startswith(prefix [,start [,end]])                       # checks whether a string starts with prefix
@@ -58,10 +61,10 @@ stringName.isdigit()                                                # whether al
 stringName.join(separator)                                          # joins the string with a separator
 stringName.lower()                                                  # to lower case, to upper case
 stringName.replace(oldSub, newSub [,maxreplace])                    # replace a substring
-stringName.
 
 
 '''LIST MUTABLE OBJECT'''
+# can hold any data type in one list, for c-lie array use array module
 del listName[index]                                                 # deletes an element
 del listName[indexStart : indexEnd]                                 # deletes a slice
 listName.append(obj)                                                # add one object to the end
@@ -109,14 +112,12 @@ tuple_count = tuple_one.count(1)                                    # calc how m
 matrix_one = [[1, 1, 1], [4, 5, 6], [7, 8, 9]]
 matrix_two = [(1, 2), (3, 4), (5, 6)]
 
-# list comprehension
 l_comp_one = [row[0] for row in matrix_one]                         # take the first element in each row
 l_comp_two = [(letter+'a') for letter in 'Hi']                      # what you want + how you call it + where
 l_comp_three = [(z+1) for z in range(5) if z % 2 == 0]              # what you want + how you call it + where + if
 l_comp_four = [(x,y) for x in listA for y in listB]
 
-# generator expression
-g_express_one = (10 * i for i in matrix_one)
+g_express_one = (10 * i for i in matrix_one)                        # generator expression
 g_express_one.next()
 
 while expression:
@@ -141,12 +142,6 @@ for x in matrix_one:                                                # else will 
         break # else clause is skipped
 else:
     raise RuntimeError("Error")
-
-
-'''SCOPE'''
-variable_name = 'any_global_variable_name'                          # use global keyword in order to mark var as global
-all_global = globals().keys()                                       # get all global objects as one dictionary
-all_global_one = globals()['string_one']                            # get object from global scope
 
 
 '''CLASSES AND OBJECTS'''
@@ -183,18 +178,18 @@ class SampleClass(object):
     def instance_method(self):
         pass
 
-# create a callable obj that wraps both a func and an associated instance
-classInstance = Sample_Class("Sergey", "Melentyev")
+# create a callable obj that wraps both a method and an associated instance
+classInstance = SampleClass("Sergey", "Melentyev")
 boundMethod = classInstance.instance_method
 boundMethod()
 
-# create a callable obj that wraps the method func, but expecs as instance of the propper type to be passed
-unboundMethod = Sample_Class.instance_method
+# create a callable obj that wraps the method, but expecs an instance of the propper type to be passed
+unboundMethod = SampleClass.instance_method
 unboundMethod(classInstance, "Sergey", "Melentyev")
 
-class Sample_Sub_Class(Sample_Class):
-    def __init__(self, name, last_name, second_name):               # sub class constructor
-        Sample_Class.__init__(self, name, last_name)                # call super class constructor
+class Sample_Sub_Class(SampleClass):
+    def __init__(self, name, last_name, second_name):              # sub class constructor
+        SampleClass.__init__(self, name, last_name)                # call super class constructor
         self.second_name = second_name
 
     def sub_instance_method(self):
@@ -217,7 +212,7 @@ try:
 except Exception as e:
     print("An error: {err}\n".format(err=e))
 
-class MyOwnErrorType(Exception):                                    # Create a custom exception
+class MyOwnErrorType(Exception):                                    # create a custom exception
     def __init__(self, errno, msg):
         self.args = (errno, msg)
         self.errno = errno
@@ -271,13 +266,11 @@ except RuntimeError:
     pass
 
 
-
 '''BUILD-IN FUNCTIONS'''
 # map() apply a func to every item in a list, return a list of all items
 lambda_function = lambda arg_one,arg_two: arg_one + arg_two
 sample_list = [0, 22.5, 40, 100]
 mapped_lambda = list(map(lambda arg: (9.0/5*arg + 32), sample_list))
-
 
 def sample_function(arg): return (9.0/5)*arg + 32
 mapped_list = list(map(sample_function, sample_list))
@@ -303,13 +296,55 @@ def any_func_name():
 
 
 '''GENERATORS'''
-# yield == return in order to keep track only on current call
+# yield = return in order to keep track only on current call
 
-
-'''STANDARD MODULES'''
-# from collections import Counter                                   # count every item in a list and create a dict
-# from collections import OrderedDict                               # dict that save the order of key/value pare
-# from collections import namedtuple                                # the same as class constructor
 
 # check speed of a function
 timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
+
+
+'''CONCURRENCY'''
+import multiprocessing
+import time
+
+def clock(interval):
+    while True:
+        print("Function. The time is %s" % time.ctime())
+        time.sleep(interval)
+
+p = multiprocessing.Process(target=clock, args=(5,))
+p.start()
+
+class ClockProcess(multiprocessing.Process):
+    def __init__(self, interval):
+        multiprocessing.Process.__init__(self)
+        self.interval = interval
+
+    def run(self):
+        while True:
+            print("Class. The time is %s" % time.ctime())
+            time.sleep(self.interval)
+
+cp = ClockProcess(5)
+cp.start()
+
+
+def consumer(input_q):
+    while True:
+        item = input_q.get()
+        if item is None:
+            break
+        print(item)
+    print("Consumer done")
+
+def producer(sequence_current, output_q):
+    for item in sequence_current:
+        output_q.put(item)
+
+q = multiprocessing.Queue()
+cons_p = multiprocessing.Process(target=consumer, args=(q,))
+cons_p.start()
+sequence = [1, 2, 3, 4, 5]
+producer(sequence, q)
+q.put(None)
+cons_p.join()
