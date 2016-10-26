@@ -27,7 +27,14 @@ def countDown(start):
         nonlocal n
         n -= 1
 
-'''OPERATORS WITH ANY SEQUENCE TYPES'''
+'''BUILD-IN SEQUENCES'''
+list, tuple, collections.deque      # container sequences, hold ref to other obj (mix type)
+str, bytes, bytearray, memoryview, array.array      # flat sequences, physically store the value (same type)
+
+list, bytearray, array.array, collections.deque, memoryview     # mutable sequences
+tuple, str, bytes       # immutable sequences
+
+'''OPERATORS WITH ANY SEQUENCES'''
 objOne + objTwo     # concatenation
 objOne * n      # makes n copies of objOne
 varOne, varTwo, varThree = objOne       # variable unpacking
@@ -38,6 +45,11 @@ any(objOne)     # return True if any item is true
 len(objOne)     # length
 min(objOne)     # min/max value in objOne
 sum(objOne [,initial])      # summ of items with an optional initial value
+
+'''SLICES'''
+new_list[:2]; new_list[2:]      # splits a sequence in two non overlapping parts
+new_list[start:stop:step]
+
 
 '''STRING IMMUTABLE OBJECTS'''
 string_one = "Python version: {x}.{y}".format(x=3, y=14)
@@ -57,10 +69,12 @@ stringName.join(separator)      # joins the string with a separator
 stringName.lower()      # to lower case, to upper case
 stringName.replace(oldSub, newSub [,maxreplace])        # replace a substring
 
-'''LIST MUTABLE OBJECT'''       # can hold any data type in one list, for c-lie array use array module
+'''LIST MUTABLE OBJECT'''       # can hold any data type in one list
 del listName[index]     # deletes an element
 del listName[indexStart : indexEnd]     # deletes a slice
 listName.append(obj)        # add one object to the end
+listName.clear()        # delete all items
+listName.copy()     # shallow copy
 listName.extend(newListName)        # add a new list to the end
 listName.count(obj)     # counts occurrences of obj
 listName.index(obj [,start [,stop]])        # returns the smallest index of obj
@@ -69,6 +83,9 @@ listName.pop([index])       # return elem on index and remove it from the list
 listName.remove(obj)        # remove obj
 listName.reverse()      # reverses items in place
 listName.sort([sortFunc [,reverse]])        # sort list of items
+
+'''ARRAY MUTABLE OBJECT'''      # import array
+array.array('I', (ord(name) for name in names))     # first argument defines the storage type
 
 '''DICTIONARY OBJECT'''     # Key values can be any immutable object (string, number, tuple)
 dict_all_keys = dictName.keys()     # make a list of all keys/values/items
@@ -81,9 +98,9 @@ dictName.get(key [,value])      # returns dictName[key], otherwise value
 dictName.pop(key [,default])        # returns dictName[key] and removes it from dictName
 dictName.update(dictNewName)        # add all obj from dictNewName to dictName
 
-'''SET OBJECT'''
-setName = {1, 2, 3}     # unordered collection of unique items
-setName.copy()      # copy
+'''SET OBJECT'''        # unordered collection of unique items
+setName = {1, 2, 3}
+setName.copy()
 setName.difference(setNewName)      # returns all the items in setName but not in setNewName
 setName.intersection(setNewName)    # returns all the items that are both in two sets
 setName.isdisjoint(setNewName)      # returns true if both have no items in common
@@ -92,32 +109,45 @@ setName.isuperset(setNewName)       # true if setName is a superset of setNewNam
 setName.symmetric_difference(setNewName)        # return all items that are in first or second set but not in both
 setName.union(setNewName)       # return all items in setNewName or setName
 
-'''TUPLE IMMUTABLE OBJECTS'''
-tuple_one = (1, 1, 2, 3)        # immutable ordered collection
+'''TUPLE IMMUTABLE OBJECTS'''       # immutable ordered collection and records with no keyes
+tuple_one = (1, 1, 2); x, y, z = tuple_one     # tuple unpacking
 tuple_count = tuple_one.count(1)        # calc how many times arg take place in tuple
+tup = (20, 8); x, y = divmod(*tup)      # prefixing an arg with a star when calling a func
+*a, b, c = range(2)     # ([], 0, 1) parallel assignment
+*a, b, c = range(5)     # ([0, 1, 2], 3, 4)
 
-'''SEQUENCE ITERATOR'''
+ids = [('USA', '311'), ('BRA', 'CE3')]      # unpacking mechanism
+for i, _ in sorted(ids): print(i)
+
+'''NAMED TUPLE'''       # from collections import namedtuple
+Any_Name = namedtuple('City', 'name country population coordinates')        # a class name and a list of names
+msk = Any_Name('Moscow', 'Russia', 36.93, (35.68, 137.69))
+Any_Name._fields        # field names of the class
+Any_Name._make(new_data)        # instantiate named tuple from an iterable
+msk._asdict()      # returns collections.OrderedDict
+
+'''SEQUENCE ITERATOR''' # vars inside sequences have their own local scope
 matrix_one = [[1, 1, 1], [4, 5, 6], [7, 8, 9]]
 matrix_two = [(1, 2), (3, 4), (5, 6)]
 
 l_comp_one = [row[0] for row in matrix_one]     # take the first element in each row
 l_comp_two = [(letter+'a') for letter in 'Hi']      # what you want + how you call it + where
 l_comp_three = [(z+1) for z in range(5) if z % 2 == 0]      # what you want + how you call it + where + if
-l_comp_four = [(x,y) for x in listA for y in listB]
+l_comp_four = [(x,y) for x in listA for y in listB]     # listA[0] with all elements from listB...
+l_comp_four = [(x,y) for x in listB for y in listA]     # listB[0] with all elements from listA...
 
-g_express_one = (10 * i for i in matrix_one)        # generator expression
+g_express_one = (10 * i for i in matrix_one)        # generator expression yields items one by one
 g_express_one.next()
 
-while expression:
-    pass
-for x in range(10):     # generator function (will not save values in ram)
-    pass
-for y in matrix_one:        # work with any sequence
-    pass
-for (a, b) in matrix_two:       # tuple unpacking
-    pass
-for (key, value) in dict_one.items():       # dictionary iteration
-    pass
+colors = ['black', 'white']; sizes = ['S', 'M', 'L']        # yields items 1 by 1, a full list is never produced
+for shirt in ('%s %s' % (c, s) for c in colors for s in sizes):
+    print(shirt)
+
+while expression: pass
+for x in range(10): pass     # generator function (will not save each value in ram)
+for y in matrix_one: pass        # work with any sequence
+for (a, b) in matrix_two: pass       # tuple unpacking
+for (key, value) in dict_one.items(): pass       # dictionary iteration
 
 for index, value in enumerate(matrix_one):      # iterator that returns sequence of tuples (index, value)
     matrix_one[index] = value * value
