@@ -47,9 +47,9 @@ min(objOne)     # min/max value in objOne
 sum(objOne [,initial])      # summ of items with an optional initial value
 
 '''SLICES'''
-new_list[:2]; new_list[2:]      # splits a sequence in two non overlapping parts
-new_list[start:stop:step]
-
+n_list[start:stop:step]
+n_list[:2]; new_list[2:]      # splits a sequence in two non overlapping parts
+n_list = [0, 1, 2, 3, 4]; n_list[1:4] = [20, 30]        # [0, 20, 30, 4]
 
 '''STRING IMMUTABLE OBJECTS'''
 string_one = "Python version: {x}.{y}".format(x=3, y=14)
@@ -82,10 +82,37 @@ listName.insert(index, obj)     # inserts obj at index
 listName.pop([index])       # return elem on index and remove it from the list
 listName.remove(obj)        # remove obj
 listName.reverse()      # reverses items in place
-listName.sort([sortFunc [,reverse]])        # sort list of items
+listName.sort([sortFunc [,reverse]])        # inplace sort list of items (return zero to indicate it)
+listName.sorted([,reverse, key])        # sort and create a new list (return new list)
 
 '''ARRAY MUTABLE OBJECT'''      # import array
-array.array('I', (ord(name) for name in names))     # first argument defines the storage type
+arr_name.__add__(arr_name_new)      # concatenation
+arr_name.__iadd__(arr_name_new)      # in-place += concatenation
+arr_name.append(i)      # append after last
+arr_name.__contains__(i)        # i in arr_name
+arr_name.__copy__()     # copy.copy
+arr_name.__deepcopy__()     # copy.deepcopy
+arr_name.count(i)       # count occurrences of an element
+arr_name.__delitem__(p)     # remove item at position p
+arr_name.extend(iter)       # append items from iterable
+arr_name.tofile(f)      # save items to binary file f
+arr_name.tolist()       # return items as numeric objects in a list
+arr_name.__fromfile(f, n)       # append n items from binary file f
+arr_name.__getitem__(p)     # get item at position
+arr_name.index(e)       # find position of first occurrence of e
+arr_name.insert(p, e)       # insert element e before the item at position p
+arr_name.itemsize       # length in bytes of each item
+arr_name.__len__()      # number of items
+arr_name.pop([p])       # remove and return item at position p
+arr_name.remove(e)      # remove first occurrence of element e by value
+arr_name.reverse()      # reverse the order
+arr_name.__setitem(p, e)        # put e in position p, overwriting existing item
+
+floats = array('d', (random() for i in range(10**3)))       # first argument defines the storage type
+fp = open('floats.bin', 'wb'); floats.tofile(fp); fp.close()        # floats.fromfile(fp, 10**3)
+
+arr_name = array.array(arr_name.typecode, sorted(arr_name))     # sort an array
+bisect.insort(arr_name, new_item)     # inserts new_item into arr_name so as to keep seq in order
 
 '''DICTIONARY OBJECT'''     # Key values can be any immutable object (string, number, tuple)
 dict_all_keys = dictName.keys()     # make a list of all keys/values/items
@@ -98,7 +125,7 @@ dictName.get(key [,value])      # returns dictName[key], otherwise value
 dictName.pop(key [,default])        # returns dictName[key] and removes it from dictName
 dictName.update(dictNewName)        # add all obj from dictNewName to dictName
 
-'''SET OBJECT'''        # unordered collection of unique items
+'''SET OBJECT'''        # unordered collection of unique items optimized for fast membership checking
 setName = {1, 2, 3}
 setName.copy()
 setName.difference(setNewName)      # returns all the items in setName but not in setNewName
@@ -307,6 +334,14 @@ def any_func_name():
 # yield = return in order to keep track only on current call
 # check speed of a function
 timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
+
+'''ALGORITHMS'''        # import bisect
+bisect.bisect(seq, item)        # binary search for needle in haystack, must be sorted
+def grade(score, breakpoint=[60, 70, 80, 90], grades='FDCBA'):
+    i = bisect.bisect(breakpoint, score); return grades[i]      # bisect.bisect return index where to insert
+[grade(score) for score in [33, 99, 77, 70, 89, 90, 100]]       # ['F', 'A', 'C', 'C', 'B', 'A', 'A']
+
+bisect.insort(seq, item)     # inserts item into seq so as to keep seq in order
 
 '''C_TYPES'''       # proxy to the C Library
 import ctypes
