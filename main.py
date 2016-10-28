@@ -114,18 +114,33 @@ fp = open('floats.bin', 'wb'); floats.tofile(fp); fp.close()        # floats.fro
 arr_name = array.array(arr_name.typecode, sorted(arr_name))     # sort an array
 bisect.insort(arr_name, new_item)     # inserts new_item into arr_name so as to keep seq in order
 
-'''DICTIONARY OBJECT'''     # Key values can be any immutable object (string, number, tuple)
-dict_all_keys = dictName.keys()     # make a list of all keys/values/items
-del dictName[key]       # removes from dict
+'''DEQUE MUTABLE OBJECT'''      # from collections import deque
+dq = deque(range(10), maxlen=10)        # good for fast inserting and removinf from both ends
+dq.rotate(3); dq.rotate(-4)     # when it is full it descards items from the opposite end
+
+'''DICTIONARY MUTABLE HASH TABLES'''     # key can be any immutable object (string, number, tuple)
+dict_name = dict(one=1, two=2, three=3)
+dict_name = {'one': 1, 'two': 2, 'three': 3}
+dict_name = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
+dict_name = dict([('one', 1), ('two', 2), ('three', 3)])
+dict_name = dict({'one':1, 'two': 2, 'three': 3})
+
+dial_codes = [(86, 'China'), (91, 'India'), (1, 'US')]
+country_code = {country: code for code, country in dial_codes}      # dict comprehensions
+
 key in dictName         # returns true if key is here
+dictName.keys()     # make a list of all keys/values/items
+dectName.__len__()      # number of items
+del dictName[key]       # removes item with key from dictName
 dictName.clear()        # removes all items
-dictName.copy()     # copy
+dictName.copy()     # shalow copy
 dictName.fromkeys(sequence [,value])        # create new dict with keys from sequence and values all set to value
-dictName.get(key [,value])      # returns dictName[key], otherwise value
+dictName.get(key [,value])      # returns dictName[key], otherwise none
 dictName.pop(key [,default])        # returns dictName[key] and removes it from dictName
 dictName.update(dictNewName)        # add all obj from dictNewName to dictName
+dictName.setdefault(k, [default])       # if k in dictName, return dictName[k], else set dictName[k]
 
-'''SET OBJECT'''        # unordered collection of unique items optimized for fast membership checking
+'''SET MUTABLE HASH TABLE OBJECT'''        # unordered collection of unique items optimized for fast membership checking
 setName = {1, 2, 3}
 setName.copy()
 setName.difference(setNewName)      # returns all the items in setName but not in setNewName
