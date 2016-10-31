@@ -118,15 +118,12 @@ bisect.insort(arr_name, new_item)     # inserts new_item into arr_name so as to 
 dq = deque(range(10), maxlen=10)        # good for fast inserting and removinf from both ends
 dq.rotate(3); dq.rotate(-4)     # when it is full it descards items from the opposite end
 
-'''DICTIONARY MUTABLE HASH TABLES'''     # key can be any immutable object (string, number, tuple)
+'''DICTIONARY MUTABLE UNORDERED HASH TABLES'''     # key can be any immutable object (string, number, tuple)
 dict_name = dict(one=1, two=2, three=3)
 dict_name = {'one': 1, 'two': 2, 'three': 3}
 dict_name = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
 dict_name = dict([('one', 1), ('two', 2), ('three', 3)])
 dict_name = dict({'one':1, 'two': 2, 'three': 3})
-
-dial_codes = [(86, 'China'), (91, 'India'), (1, 'US')]
-country_code = {country: code for code, country in dial_codes}      # dict comprehensions
 
 key in dictName         # returns true if key is here
 dictName.keys()     # make a list of all keys/values/items
@@ -134,22 +131,35 @@ dectName.__len__()      # number of items
 del dictName[key]       # removes item with key from dictName
 dictName.clear()        # removes all items
 dictName.copy()     # shalow copy
-dictName.fromkeys(sequence [,value])        # create new dict with keys from sequence and values all set to value
+dictName.fromkeys(sequence [,value])        # new dict with keys from sequence and values all set to value
 dictName.get(key [,value])      # returns dictName[key], otherwise none
 dictName.pop(key [,default])        # returns dictName[key] and removes it from dictName
 dictName.update(dictNewName)        # add all obj from dictNewName to dictName
 dictName.setdefault(k, [default])       # if k in dictName, return dictName[k], else set dictName[k]
 
-'''SET MUTABLE HASH TABLE OBJECT'''        # unordered collection of unique items optimized for fast membership checking
-setName = {1, 2, 3}
-setName.copy()
+collections.OrderedDict     # dict variation, maintains keys in insertion order
+collections.ChainMap        # dict variation, holds a list of mappings that can be searched as one
+collections.Counter         # dict variation, mapping that holds an int value for each key
+collections.UserDict        # dict variation, pure Python map implementation
+
+'''SET MUTABLE UNORDERED HASH TABLES'''        # unordered collect of unique items optimized for fast membership
+setName = {1, 2, 3}     # set literals, use set() empty constructor for set initialization
+setName.copy()      # shallow copy
+setName.add(setNewName)     # add elements
+setName.clear()     # remove all elements
+setName.discard(e)      # remove element e from setName
+setName.pop()       # remove and return an element from setName
+setName.remove(e)       # remove e from setName
 setName.difference(setNewName)      # returns all the items in setName but not in setNewName
 setName.intersection(setNewName)    # returns all the items that are both in two sets
 setName.isdisjoint(setNewName)      # returns true if both have no items in common
 setName.issubset(setNewName)        # true if setName is a subset of setNewName
 setName.isuperset(setNewName)       # true if setName is a superset of setNewName
-setName.symmetric_difference(setNewName)        # return all items that are in first or second set but not in both
+setName.symmetric_difference(setNewName)        # return items that are in 1st/2nd set but not in both
 setName.union(setNewName)       # return all items in setNewName or setName
+
+'''FROZEN SET IMMUTABLE OBJECTS'''
+frozenset(range(10))
 
 '''TUPLE IMMUTABLE OBJECTS'''       # immutable ordered collection and records with no keyes
 tuple_one = (1, 1, 2); x, y, z = tuple_one     # tuple unpacking
@@ -162,7 +172,7 @@ ids = [('USA', '311'), ('BRA', 'CE3')]      # unpacking mechanism
 for i, _ in sorted(ids): print(i)
 
 '''NAMED TUPLE'''       # from collections import namedtuple
-Any_Name = namedtuple('City', 'name country population coordinates')        # a class name and a list of names
+Any_Name = namedtuple('City', 'name country population coordinates')        # class name and list of names
 msk = Any_Name('Moscow', 'Russia', 36.93, (35.68, 137.69))
 Any_Name._fields        # field names of the class
 Any_Name._make(new_data)        # instantiate named tuple from an iterable
@@ -181,7 +191,12 @@ l_comp_four = [(x,y) for x in listB for y in listA]     # listB[0] with all elem
 g_express_one = (10 * i for i in matrix_one)        # generator expression yields items one by one
 g_express_one.next()
 
-colors = ['black', 'white']; sizes = ['S', 'M', 'L']        # yields items 1 by 1, a full list is never produced
+dial_codes = [(86, 'China'), (91, 'India'), (1, 'US')]
+d_comp_one = {country: code for code, country in dial_codes}      # dict comprehensions
+
+s_comp_one = {i for i in range(10)}     # set comprehensions
+
+colors = ['black', 'white']; sizes = ['S', 'M', 'L']        # yields items 1 by 1, full list is not produced
 for shirt in ('%s %s' % (c, s) for c in colors for s in sizes):
     print(shirt)
 
@@ -203,7 +218,7 @@ for x in matrix_one:        # else will be executed if loop is runs to completio
 else:
     raise RuntimeError("Error")
 
-'''CLASSES AND OBJECTS'''       # functions (methods), variables (class variables), computed attributes (properties)
+'''CLASSES AND OBJECTS'''       # methods, class variables, computed attributes (properties)
 class SampleClass(object):
     species = 'Human'       # class object attribute the same for all instances
 
