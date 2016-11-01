@@ -218,6 +218,45 @@ for x in matrix_one:        # else will be executed if loop is runs to completio
 else:
     raise RuntimeError("Error")
 
+'''GENERATORS'''
+# yield = return in order to keep track only on current call
+
+'''FUNCTIONS FIRST CLASS OBJECTS'''
+lambda arg_one,arg_two: arg_one + arg_two     # inline anonymous function
+
+def factorial(n): return 1 if n < 2 else n * factorial(n-1); fact = factorial
+list(map(fact, range(6)))       # map build-in func
+[fact(n) for n in range(6)]     # list comprehension version
+
+list(map(factorial, filter(lambda n: n % 2, range(6))))     # map and filter build-in funcs
+[fact(n) for n in range(6) if n % 2]        # list comprehension version
+
+reduce(add, range(100))     # reduce build-in func, apply some operator to the sequence (accumulating)
+sum(range(100))     # from operator import add, sum new altarnative to reduce
+
+all(iterable)       # return True if every element is true
+any(iterable)       # return True if any element is true
+
+def html_tag(name, *content, cls=None, **attrs):
+    if cls is not None: attrs['class'] = cls
+    if attrs: attr_str = ''.join(' %s="%s"' % (attr, value) for attr, value in sorted(attrs.items()))
+    else: attr_str = ''
+    if content: return '\n'.join('<%s%s>%s</%s>' % (name, attr_str, c, name) for c in content)
+    else: return '<%s%s />' % (name, attr_str)
+html_tag('p')       # single positional argument catched with first arg (name)
+html_tag('h3', 'Header', 'New')     # any number of args after the first are catched with *content as tuple
+html_tag('h2', 'Header', id=1, src='name.jpg')      # any number of keyword args that are not explicitly named are catched with **arrts as a dict
+html_tag('h3', 'Header', 'New', cls='sidebar', id=33)       # cls parameter can only be passed as a keyword arg
+my_tag = {'name': 'img', 'title': 'Sunset', 'src': 'sunset.jpg', 'cls': 'framed'}
+html_tag(**my_tag)      # prefix dict with ** passes all its items as separate args
+
+def name(text:str, max_len:'int > 0' = 80) -> str:      # each arg with annotation expression preceded by :
+    """ annotation goes here"""
+    return text
+
+'''DESIGN PATTERNS WITH FIRST CLASS FUNCTIONS'''
+
+
 '''CLASSES AND OBJECTS'''       # methods, class variables, computed attributes (properties)
 class SampleClass(object):
     species = 'Human'       # class object attribute the same for all instances
@@ -267,6 +306,41 @@ class Sample_Sub_Class(SampleClass):
         super().instance_method()       # call super class method
         pass
 
+'''DECORATORS'''
+def decorator_func(func):
+    def insider_func():     # add logic before and after decorated func call
+        print('Code here, before executing the func')
+        func()
+        print('Code here will execute after all')
+    return insider_func
+@decorator_func     #more than one can be applied
+def any_func_name(): print('This function needs a decorator')
+
+'''CONTEXT MANAGER AND WITH'''
+items = [1, 2, 3]
+class ListTransaction(object):
+    def __init__(self, theList):
+        self.theList = theList
+    def __enter__(self):
+        self.workingCopy = list(self.theList)
+        return self.workingCopy
+    def __exit__(self, type, value, tb):
+        if type is None:
+            self.theList[:] = self.workingCopy
+        return False
+
+with ListTransaction(items) as working:     # will produce [1, 2, 3, 4, 5]
+    working.append(4)
+    working.append(5)
+
+try:
+    with ListTransaction(items) as working:     # will produce [1, 2, 3, 4, 5]
+        working.append(6)
+        working.append(7)
+        raise RuntimeError("Something happened!")
+except RuntimeError:
+    pass
+
 '''EXCEPTION HANDLING'''
 try:
     answer = 2 + 'a'
@@ -309,62 +383,6 @@ class ListTransaction(object):
             self.theList[:] = self.workingCopy
         return False
 
-'''CONTEXT MANAGER AND WITH'''
-items = [1, 2, 3]
-class ListTransaction(object):
-    def __init__(self, theList):
-        self.theList = theList
-    def __enter__(self):
-        self.workingCopy = list(self.theList)
-        return self.workingCopy
-    def __exit__(self, type, value, tb):
-        if type is None:
-            self.theList[:] = self.workingCopy
-        return False
-
-with ListTransaction(items) as working:     # will produce [1, 2, 3, 4, 5]
-    working.append(4)
-    working.append(5)
-
-try:
-    with ListTransaction(items) as working:     # will produce [1, 2, 3, 4, 5]
-        working.append(6)
-        working.append(7)
-        raise RuntimeError("Something happened!")
-except RuntimeError:
-    pass
-
-'''BUILD-IN FUNCTIONS'''        # map() apply a func to every item in a list, return a list of all items
-lambda_function = lambda arg_one,arg_two: arg_one + arg_two
-sample_list = [0, 22.5, 40, 100]
-mapped_lambda = list(map(lambda arg: (9.0/5*arg + 32), sample_list))
-
-def sample_function(arg): return (9.0/5)*arg + 32
-mapped_list = list(map(sample_function, sample_list))
-
-# reduce() apply a func to every item in a list in pare of two, return only one final item
-# filter() apply a func that return a bool to the list in pare of two, return only one final item
-# zip() combine items at each index in a tuple from two lists
-# all() return True if all elements are true
-# any() return True if any element is true
-
-'''DECORATORS'''
-def decorator_func(func):
-    def insider_func():     # add logic before and after decorated func call
-        print('Code here, before executing the func')
-        func()
-        print('Code here will execute after all')
-    return insider_func
-
-@decorator_func     #more than one can be applied
-def any_func_name():
-    print('This function needs a decorator')
-
-'''GENERATORS'''
-# yield = return in order to keep track only on current call
-# check speed of a function
-timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
-
 '''ALGORITHMS'''        # import bisect
 bisect.bisect(seq, item)        # binary search for needle in haystack, must be sorted
 def grade(score, breakpoint=[60, 70, 80, 90], grades='FDCBA'):
@@ -395,27 +413,22 @@ class ClockProcess(multiprocessing.Process):
     def __init__(self, interval):
         multiprocessing.Process.__init__(self)
         self.interval = interval
-
     def run(self):
         while True:
             print("Class. The time is %s" % time.ctime())
             time.sleep(self.interval)
-
 cp = ClockProcess(5)
 cp.start()
-
 
 def consumer(input_q):
     while True:
         item = input_q.get()
-        if item is None:
-            break
+        if item is None: break
         print(item)
     print("Consumer done")
 
 def producer(sequence_current, output_q):
-    for item in sequence_current:
-        output_q.put(item)
+    for item in sequence_current: output_q.put(item)
 
 q = multiprocessing.Queue()
 cons_p = multiprocessing.Process(target=consumer, args=(q,))
@@ -424,3 +437,15 @@ sequence = [1, 2, 3, 4, 5]
 producer(sequence, q)
 q.put(None)
 cons_p.join()
+
+
+
+
+
+
+
+'''ALGORITHMS MIT'''
+# insertion sort (алгоритм сортировки вставкой) for small amount of data
+
+# check speed of a function
+timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
