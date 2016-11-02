@@ -254,8 +254,16 @@ def name(text:str, max_len:'int > 0' = 80) -> str:      # each arg with annotati
     """ annotation goes here"""
     return text
 
-'''DESIGN PATTERNS WITH FIRST CLASS FUNCTIONS'''
-
+'''CLOSURES'''      # is a func that retains the bindings of the free vars that exist when the func is defined
+def make_average():
+    series = []
+    def average(new_value):     # use nonlocal modifier with immutable types
+        series.append(new_value)
+        total = sum(series)
+        return total / len(series)
+    return average
+avg = make_average()        # make_average has already returned, its local scope is long gone
+print(avg(10)); print(avg(11)); print(avg(12))      # series[] is a free var that isnt bound in the local scope
 
 '''CLASSES AND OBJECTS'''       # methods, class variables, computed attributes (properties)
 class SampleClass(object):
@@ -306,15 +314,30 @@ class Sample_Sub_Class(SampleClass):
         super().instance_method()       # call super class method
         pass
 
-'''DECORATORS'''
-def decorator_func(func):
-    def insider_func():     # add logic before and after decorated func call
-        print('Code here, before executing the func')
-        func()
-        print('Code here will execute after all')
-    return insider_func
-@decorator_func     #more than one can be applied
-def any_func_name(): print('This function needs a decorator')
+'''DECORATORS'''        # import time execution, before runtime
+registry = []
+def decorator_func(func_arg):       #run at import time before any other func call
+    print('running decorator_func(%s)' % func_arg)
+    registry.append(func_arg)
+    return func_arg
+
+@decorator_func
+def func_one(): print('running func_one()')     # run only if explicitly invoked
+
+'''DECORATOR FACTORY'''
+registry = set()
+def register(active=True):
+    def decorate(func):
+        print('running register(active=%s)->decorate(%s)' % (active, func))
+        if active: registry.add(func)
+        else: registry.discard(func)
+        return func
+    return decorate
+
+@register(active=False)
+def f1(): print('running f1()')
+@register()
+def f2(): print('running f2()')
 
 '''CONTEXT MANAGER AND WITH'''
 items = [1, 2, 3]
@@ -449,3 +472,60 @@ cons_p.join()
 
 # check speed of a function
 timer = timeit.timeit("'-'.join(str(n) for n in range(100))", number=1000)
+
+'''DESIGN PATTERNS'''
+from abc import ABCMeta, abstractmethod
+from collections import namedtuple
+Customer = namedtuple('Customer', 'name fidelity')
+
+class LineItem:
+    def __init__(self, product, quantity, price):
+        self.product = product
+        self.quantity = quantity
+        self.price = price
+    def total(self): return self.price * self.quantity
+
+class Order:
+    def __init__(self, customer, cart, promotion=None):
+        self.customer = customer
+        self.cart = list(cart)
+        self.promotion = promotion
+    def total(self):
+        if not hasattr(self, '__total'): self.__total = sum(item.total() for item in self.cart)
+        return self.__total
+    def due(self):
+        if self.promotion is None: discount = 0
+        else: discount = self.promotion.discount(self)
+        return self.total() - discount
+    def __repr__(self):
+        fmt = '<Order total: {:.2f} due: {:.2f}>'
+        return fmt.format(self.total(), self.due())
+
+class Promotion(metaclass=ABCMeta):
+    @abstractmethod
+    def discount(self, order): """Return discount as a positive dollar amount"""
+
+class FidelityPromo(Promotion):
+    """5% discount for customer with 1000 or more fidelity points"""
+    def discount(self, order): return order.total() * .05 if order.customer.fidelity >= 1000 else 0
+
+class BulkItemPromo(Promotion):
+    """10% discount for each LineItem with 20 or more units"""
+    def discount(self, order):
+        discount = 0
+        for item in order.cart:
+            if item.quantity >= 20: discount += item.total() * .1
+        return discount
+
+class LargeOrderPromo(Promotion):
+    """7% discount for order with 10 or more distinct items"""
+    def discount(self, order):
+        distinct_items = {item.product for item in order.cart}
+        if len(distinct_items) >= 10: return order.total() * .07
+        return 0
+
+joe = Customer('John Doe', 0); ann = Customer('Ann Smith', 1100)
+cart = [LineItem('banana', 4, .5), LineItem('apple', 10, 1.5), LineItem('mellon', 5, 5.0)]
+Order(joe, cart, FidelityPromo()); Order(ann, cart, FidelityPromo())
+long_order = [LineItem(str(item_code), 1, 1.0) for item_code in range(10)]
+Order(joe, long_order, LargeOrderPromo()); Order(ann, long_order, LargeOrderPromo())
